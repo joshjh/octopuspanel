@@ -27,10 +27,16 @@ public class Main {
                 System.out.println("initialised the module");
                 System.out.println("Sending Display ON");
                 Display.displayInit();
+                Display.clearDisplay();
                 Display.lcdSetRGB(243, 100, 55);
-                Display.lcdSetCursor(0, 1);
-                char[] firstline = ("Current Price: " + api.GetCurrentPrice()).toCharArray();
+                Display.lcdSetCursor(0, 0);
+                char[] firstline = "Current Price: ".toCharArray();
+                char [] secondline = String.valueOf(api.GetCurrentPrice()).toCharArray();
                 Display.lcdWrite(firstline);
+                Display.lcdSetCursor(0, 1);
+                Display.lcdWrite(secondline);
+                int [] colour = ColourSetter.GetColour(api.GetCurrentPrice());
+                Display.lcdSetRGB(colour[0], colour[1], colour[2]);
 
             } catch (MultiInstanceError e) {
                 // TODO Auto-generated catch block

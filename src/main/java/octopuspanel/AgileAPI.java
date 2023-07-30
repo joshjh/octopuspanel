@@ -72,15 +72,15 @@ public class AgileAPI {
             octoPrices = ResponseHandlers.AgilePriceResponseHandle(httpclient, prices_httpget, context);
         }
 
-    public String GetCurrentPrice() {
+    public double GetCurrentPrice() {
         ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
         for (OctoPrice octoprice : this.octoPrices) {
                 if (octoprice.StartTime.isBefore(datetime_now) & octoprice.EndTime.isAfter(datetime_now)) {
-                    return octoprice.toString();
+                    return octoprice.UnitPrice;
                 }
             
         }
-        return "Cannot resolve price";
+        return 0.00D;
     }
     public void PrintProducts() {
         for (OctoProduct product : octoProducts) {
