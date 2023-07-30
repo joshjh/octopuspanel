@@ -58,7 +58,7 @@ public class AgileAPI {
     public void GetAPIData() throws URISyntaxException, java.io.IOException {
         HttpContext context = new BasicHttpContext();
         CloseableHttpClient httpclient = InitHttp();
-        URI productsuri, priceuri, indiviual_product_URI;
+        URI productsuri, priceuri;
 
         // Products
             productsuri = AgileProductsURI();

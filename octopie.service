@@ -1,0 +1,15 @@
+[Unit]
+Description=Java Agile Octopus price scroller
+After=network.target
+DefaultDependencies=no
+
+[Service]
+Type=simple
+ExecStart=/usr/lib/jvm/default-java/bin/java -Dfile.encoding=UTF-8 -p /home/josh/octopuspanel/octopuspanel/dist/lib -m com.rasp.octopuspanel/octopuspanel.Main
+TimeoutStartSec=0
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+
