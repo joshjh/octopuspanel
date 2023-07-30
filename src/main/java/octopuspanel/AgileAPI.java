@@ -55,8 +55,7 @@ public class AgileAPI {
         
     }
     
-    public AgileAPI() throws URISyntaxException, java.io.IOException {
-        
+    public void GetAPIData() throws URISyntaxException, java.io.IOException {
         HttpContext context = new BasicHttpContext();
         CloseableHttpClient httpclient = InitHttp();
         URI productsuri, priceuri, indiviual_product_URI;
@@ -72,6 +71,11 @@ public class AgileAPI {
             octoPrices = ResponseHandlers.AgilePriceResponseHandle(httpclient, prices_httpget, context);
         }
 
+    public AgileAPI() throws URISyntaxException, java.io.IOException {
+        
+        GetAPIData();
+        }
+
     public double GetCurrentPrice() {
         ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
         for (OctoPrice octoprice : this.octoPrices) {
@@ -79,9 +83,46 @@ public class AgileAPI {
                     return octoprice.UnitPrice;
                 }
             
+            }
+            return 0.00D;
         }
+
+    public double NextPrice() {
+        ZonedDateTime next_segment = LocalDateTime.now().atZone(timezone).plusMinutes(30);
+         for (OctoPrice octoprice : this.octoPrices) {
+                if (octoprice.StartTime.isBefore(next_segment) & octoprice.EndTime.isAfter(next_segment)) {
+                    return octoprice.UnitPrice;
+                }
+            }
         return 0.00D;
-    }
+        }
+    public double NextHour() {
+        ZonedDateTime next_segment = LocalDateTime.now().atZone(timezone).plusHours(1);
+         for (OctoPrice octoprice : this.octoPrices) {
+                if (octoprice.StartTime.isBefore(next_segment) & octoprice.EndTime.isAfter(next_segment)) {
+                    return octoprice.UnitPrice;
+                }
+            }
+        return 0.00D;
+        }
+    
+     public String CheapestHour() {
+        ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
+        double lowest = 100D;
+        String lowstring = "Cheapest Hour Failed";
+        ZoneId zuluzone = ZoneId.of("Z"); // prices are stored in ZULU time in the OctoPrice Object.
+        for (OctoPrice octoprice : this.octoPrices) {
+                if (octoprice.EndTime.isAfter(datetime_now)) {
+                    if (octoprice.UnitPrice <= lowest) {
+                        lowest = octoprice.UnitPrice;
+                        // move to local datetime, at zuro, then create with current timezone, then local date time, then local time.  etc etc.
+                        lowstring = String.valueOf(octoprice.UnitPrice) + " @"+ octoprice.StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime();
+                    }
+                }
+            }
+        return lowstring;
+     }   
+
     public void PrintProducts() {
         for (OctoProduct product : octoProducts) {
             System.out.println(product);
