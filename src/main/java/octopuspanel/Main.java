@@ -15,7 +15,66 @@ import raspb.RGB1602;
  */
 public class Main {
 
-        /**
+    static int screenMoveDelay = 10000;
+
+    public static void ShowCurrentPrice(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "Current Price: ".toCharArray();
+        char [] secondline = String.valueOf(api.GetCurrentPrice()).toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        int [] colour = ColourSetter.GetColour(api.GetCurrentPrice());
+        Display.lcdSetRGB(colour[0], colour[1], colour[2]);
+        Thread.sleep(delay);
+    }
+
+    public static void ShowCheapest30Mins(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "Cheapest 30 minutes:".toCharArray();
+        char[] secondline = api.CheapestSegment().toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        Thread.sleep(delay);
+    }
+       
+    public static void ShowNext30Mins(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "Next 30 minutes:".toCharArray();
+        char[] secondline = String.valueOf(api.NextPrice()).toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        Thread.sleep(delay);
+    }
+
+    public static void ShowNext60Mins(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "Next 60 minutes:".toCharArray();
+        char[] secondline = String.valueOf(api.NextHour()).toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        Thread.sleep(delay);
+    }
+    public static void ShowCheapest3Segements(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "Cheap 3 Segs:".toCharArray();
+        char[] secondline = api.Cheapest_3Run().toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        System.out.println(api.Cheapest_3Run());
+        Thread.sleep(delay);
+    }
+
+    /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -30,34 +89,14 @@ public class Main {
                 Display.clearDisplay();
                 int iterations = 0;
                 while (true) {
-                    Display.lcdClearDisplay();
-                    Display.lcdSetCursor(0, 0);
-                    char[] firstline = "Current Price: ".toCharArray();
-                    char [] secondline = String.valueOf(api.GetCurrentPrice()).toCharArray();
-                    Display.lcdWrite(firstline);
-                    Display.lcdSetCursor(0, 1);
-                    Display.lcdWrite(secondline);
-                    int [] colour = ColourSetter.GetColour(api.GetCurrentPrice());
-                    Display.lcdSetRGB(colour[0], colour[1], colour[2]);
-                    Thread.sleep(10000);
-                    Display.lcdClearDisplay();
-                    Display.lcdSetCursor(0, 0);
-                    firstline = "Cheapest 30 minutes:".toCharArray();
-                    secondline = api.CheapestHour().toCharArray();
-                    Display.lcdWrite(firstline);
-                    Display.lcdSetCursor(0, 1);
-                    Display.lcdWrite(secondline);
-                    Thread.sleep(10000);
-                    Display.lcdClearDisplay();
-                    Display.lcdSetCursor(0, 0);
-                    firstline = "Next 30 minutes:".toCharArray();
-                    secondline = String.valueOf(api.NextPrice()).toCharArray();
-                    Display.lcdWrite(firstline);
-                    Display.lcdSetCursor(0, 1);
-                    Display.lcdWrite(secondline);
-                    Thread.sleep(10000);
+                    ShowCurrentPrice(Display, api, screenMoveDelay);
+                    ShowCheapest30Mins(Display, api, screenMoveDelay);
+                    ShowNext30Mins(Display, api, screenMoveDelay);
+                    ShowNext60Mins(Display, api, screenMoveDelay);
+                    ShowCheapest3Segements(Display, api, screenMoveDelay);
                     iterations++;
-                    if (iterations == 500) {
+
+                    if (iterations == 1500) {
                         // reload the API time and product sets every 500 turns
                         try {
                             api.GetAPIData();
