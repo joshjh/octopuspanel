@@ -78,38 +78,27 @@ public class Main {
      */
     public static void main(String[] args) {
         try {
-            AgileAPI api = new AgileAPI();
+            AgileAPI api = new AgileAPI(4);
+            Thread t1 = new Thread(api);
+            t1.setDaemon(true);
+            t1.start();
             System.out.println(api.GetCurrentPrice());
+            System.out.println(String.format("The thread state is %s", t1.getState()));
             try {
                 RGB1602 Display = new RGB1602(2, 16);
                 System.out.println("initialised the module");
                 System.out.println("Sending Display ON");
                 Display.displayInit();
                 Display.clearDisplay();
-                int iterations = 0;
-                while (true) {
-                    if (iterations == 500) {
-                    // reload the API time and product sets every 500 turns
-                        try {
-                            api.GetAPIData();
-                            iterations = 0;
-                        }
-                        catch (IOException e) {
-                            System.out.println("Something bad happened whilst loading the API datasets!");
-                        }
-                     }
+                
+                while (true) { // delay is screenmove detail.  API update is now Threaded
                     ShowCurrentPrice(Display, api, screenMoveDelay);
                     ShowCheapest30Mins(Display, api, screenMoveDelay);
                     ShowNext30Mins(Display, api, screenMoveDelay);
                     ShowNext60Mins(Display, api, screenMoveDelay);
                     ShowCheapest3Segements(Display, api, screenMoveDelay);
-                    iterations++;
-
                 }
-            } catch (MultiInstanceError e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (MultiInstanceError | InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }

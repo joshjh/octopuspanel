@@ -1,5 +1,6 @@
 package octopuspanel;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -11,20 +12,29 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.protocol.BasicHttpContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.http.client.utils.URIBuilder;
+import java.util.concurrent.TimeUnit;
 
-public class AgileAPI {
+public class AgileAPI extends Thread{
     final static String AGILE_PRODUCT_CODE = "AGILE-FLEX-BB-23-02-08";
     // there are different pricings in the UK depending on area.  Who knew?  The South West is 'L'
     final static String AGILE_TARIFF_CODE = String.format("E-1R-%s-L", AGILE_PRODUCT_CODE);
     final static ZoneId timezone = ZoneId.systemDefault();
+    private ZonedDateTime lastAPIUpdate;
     public OctoPrice[] octoPrices;
     public OctoProduct[] octoProducts;
+    public int agileRefreshInterval;
+    
     private CloseableHttpClient InitHttp() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         return httpclient;
-
     }
-    
+
+    public static double RoundResult(double d) {
+        d = Math.round(d * 100.00D);
+        d = d / 100.00D;
+        return d;
+    }
+
     /** 
      * @return URI
      * @throws URISyntaxException
@@ -74,11 +84,12 @@ public class AgileAPI {
         }
         finally {
             httpclient.close();
+            lastAPIUpdate =  LocalDateTime.now().atZone(timezone);
         }
     }
 
-    public AgileAPI() throws URISyntaxException, java.io.IOException {
-        
+    public AgileAPI(int agileRefreshInterval) throws URISyntaxException, java.io.IOException {
+        this.agileRefreshInterval = agileRefreshInterval;
         GetAPIData();
         }
 
@@ -86,7 +97,7 @@ public class AgileAPI {
         ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
         for (OctoPrice octoprice : this.octoPrices) {
                 if (octoprice.StartTime.isBefore(datetime_now) & octoprice.EndTime.isAfter(datetime_now)) {
-                    return octoprice.UnitPrice;
+                    return RoundResult(octoprice.UnitPrice);
                 }
             
             }
@@ -97,16 +108,17 @@ public class AgileAPI {
         ZonedDateTime next_segment = LocalDateTime.now().atZone(timezone).plusMinutes(30);
          for (OctoPrice octoprice : this.octoPrices) {
                 if (octoprice.StartTime.isBefore(next_segment) & octoprice.EndTime.isAfter(next_segment)) {
-                    return octoprice.UnitPrice;
+                    return RoundResult(octoprice.UnitPrice);
                 }
             }
         return 0.00D;
         }
+        
     public double NextHour() {
         ZonedDateTime next_segment = LocalDateTime.now().atZone(timezone).plusHours(1);
          for (OctoPrice octoprice : this.octoPrices) {
                 if (octoprice.StartTime.isBefore(next_segment) & octoprice.EndTime.isAfter(next_segment)) {
-                    return octoprice.UnitPrice;
+                    return RoundResult(octoprice.UnitPrice);
                 }
             }
         return 0.00D;
@@ -122,7 +134,7 @@ public class AgileAPI {
                     if (octoPrice.UnitPrice <= lowestDouble) {
                         lowestDouble = octoPrice.UnitPrice;
                         // move to local datetime, at zuro, then create with current timezone, then local date time, then local time.  etc etc.
-                        lowString = String.valueOf(octoPrice.UnitPrice) + " @"+ octoPrice.StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime();
+                        lowString = String.valueOf(RoundResult(octoPrice.UnitPrice)) + " @"+ octoPrice.StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime();
                     }
                 }
             }
@@ -140,15 +152,41 @@ public class AgileAPI {
             if (octoPrices[x].EndTime.isAfter(datetime_now)) {
                 if (runTotalAve < lowestDouble) {
                     lowestDouble = runTotalAve;
-                    lowString = String.valueOf(lowestDouble) +":" + octoPrices[x].StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime() +
+                    lowString = String.valueOf(RoundResult(lowestDouble)) +":" + octoPrices[x].StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime() +
                     ":" + octoPrices[x-2].EndTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime();
                 }
             }
         }
         return lowString;
      }
+    
+    
+    /** 
+     * run method for the threaded implementation of the API
+     * examines the time via LocalDateTime.now().atZone(timezone);
+     * we will look for updates after 4 pm.
+     * @throws RuntimeException
+     */
+    public void run() throws RuntimeException {
+        System.out.println("Agile API Thread Running");
+        while (true) {
      
-
+                try {
+                    TimeUnit.MINUTES.sleep(agileRefreshInterval);
+                    LocalDateTime datetime_now = LocalDateTime.now();
+                    ZoneId zuluzone = ZoneId.of("Z");
+                    // if now is after the pricecreated time of the [0] price in teh octPrices array plus ten hours, it's time for refreshing, otherwise dont make a wasted call to the Octpus API.  If it's successful octoPrices.priceCreateTime will reset to now and the if condition is false.
+                    if (datetime_now.isAfter(octoPrices[0].priceCreateTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().plusHours(10))) {
+                        GetAPIData();
+                    }
+                   
+                } catch (InterruptedException | URISyntaxException | IOException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+        }
+    }
     public void PrintProducts() {
         for (OctoProduct product : octoProducts) {
             System.out.println(product);
