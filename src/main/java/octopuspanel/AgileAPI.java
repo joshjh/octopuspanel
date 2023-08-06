@@ -1,5 +1,6 @@
 package octopuspanel;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -11,18 +12,20 @@ import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.protocol.BasicHttpContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
 import org.apache.http.client.utils.URIBuilder;
+import java.util.concurrent.TimeUnit;
 
-public class AgileAPI {
+public class AgileAPI extends Thread{
     final static String AGILE_PRODUCT_CODE = "AGILE-FLEX-BB-23-02-08";
     // there are different pricings in the UK depending on area.  Who knew?  The South West is 'L'
     final static String AGILE_TARIFF_CODE = String.format("E-1R-%s-L", AGILE_PRODUCT_CODE);
     final static ZoneId timezone = ZoneId.systemDefault();
     public OctoPrice[] octoPrices;
     public OctoProduct[] octoProducts;
+    public int agileRefreshInterval;
+    
     private CloseableHttpClient InitHttp() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         return httpclient;
-
     }
     
     /** 
@@ -77,8 +80,8 @@ public class AgileAPI {
         }
     }
 
-    public AgileAPI() throws URISyntaxException, java.io.IOException {
-        
+    public AgileAPI(int agileRefreshInterval) throws URISyntaxException, java.io.IOException {
+        this.agileRefreshInterval = agileRefreshInterval;
         GetAPIData();
         }
 
@@ -147,8 +150,21 @@ public class AgileAPI {
         }
         return lowString;
      }
+    
+    public void run() throws RuntimeException {
+        System.out.println("Agile API Thread Running");
+        while (true) {
      
-
+                try {
+                    TimeUnit.HOURS.sleep(agileRefreshInterval);
+                    GetAPIData();
+                } catch (InterruptedException | URISyntaxException | IOException e ) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    throw new RuntimeException(e);
+                }
+        }
+    }
     public void PrintProducts() {
         for (OctoProduct product : octoProducts) {
             System.out.println(product);
