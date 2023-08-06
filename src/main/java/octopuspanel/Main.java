@@ -70,7 +70,6 @@ public class Main {
         Display.lcdWrite(firstline);
         Display.lcdSetCursor(0, 1);
         Display.lcdWrite(secondline);
-        System.out.println(api.Cheapest_3Run());
         Thread.sleep(delay);
     }
 
@@ -89,6 +88,16 @@ public class Main {
                 Display.clearDisplay();
                 int iterations = 0;
                 while (true) {
+                    if (iterations == 500) {
+                    // reload the API time and product sets every 500 turns
+                        try {
+                            api.GetAPIData();
+                            iterations = 0;
+                        }
+                        catch (IOException e) {
+                            System.out.println("Something bad happened whilst loading the API datasets!");
+                        }
+                     }
                     ShowCurrentPrice(Display, api, screenMoveDelay);
                     ShowCheapest30Mins(Display, api, screenMoveDelay);
                     ShowNext30Mins(Display, api, screenMoveDelay);
@@ -96,16 +105,6 @@ public class Main {
                     ShowCheapest3Segements(Display, api, screenMoveDelay);
                     iterations++;
 
-                    if (iterations == 1500) {
-                        // reload the API time and product sets every 500 turns
-                        try {
-                            api.GetAPIData();
-                            iterations = 0;
-                    }
-                        catch (IOException e) {
-                            System.out.println("Something bad happened whilst loading the API datasets!");
-                        }
-                }
                 }
             } catch (MultiInstanceError e) {
                 // TODO Auto-generated catch block
