@@ -48,7 +48,7 @@ public class ResponseHandlers {
             OctoProductArray[x].is_business= JSONResultsArray.getJSONObject(x).getBoolean("is_business");
             OctoProductArray[x].is_prepay= JSONResultsArray.getJSONObject(x).getBoolean("is_prepay");
             OctoProductArray[x].is_variable= JSONResultsArray.getJSONObject(x).getBoolean("is_variable");
-            OctoProductArray[x].is_restrcted= JSONResultsArray.getJSONObject(x).getBoolean("is_restricted");
+            OctoProductArray[x].is_restricted= JSONResultsArray.getJSONObject(x).getBoolean("is_restricted");
             System.out.println("Generated new OctoProduct Object in the array: " + OctoProductArray[x].toString());
         }
         EntityUtils.consumeQuietly(httpResponse.getEntity());
