@@ -35,6 +35,4 @@ public class OctoProduct {
         ) {return true;}
         return false;
     }
-
-    //TODO HASHCODE AND .EQUALS()
     }

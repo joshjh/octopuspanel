@@ -19,7 +19,7 @@ public class AgileAPI extends Thread{
     // there are different pricings in the UK depending on area.  Who knew?  The South West is 'L'
     final static String AGILE_TARIFF_CODE = String.format("E-1R-%s-L", AGILE_PRODUCT_CODE);
     final static ZoneId timezone = ZoneId.systemDefault();
-    private ZonedDateTime lastAPIUpdate;
+    public ZonedDateTime lastAPIUpdate;
     public OctoPrice[] octoPrices;
     public OctoProduct[] octoProducts;
     public int agileRefreshInterval;
@@ -89,6 +89,7 @@ public class AgileAPI extends Thread{
     }
 
     public AgileAPI(int agileRefreshInterval) throws URISyntaxException, java.io.IOException {
+        // agile refresh interval (minutes)
         this.agileRefreshInterval = agileRefreshInterval;
         GetAPIData();
         }
@@ -169,16 +170,25 @@ public class AgileAPI extends Thread{
      */
     public void run() throws RuntimeException {
         System.out.println("Agile API Thread Running");
+        
         while (true) {
      
                 try {
                     TimeUnit.MINUTES.sleep(agileRefreshInterval);
                     LocalDateTime datetime_now = LocalDateTime.now();
                     ZoneId zuluzone = ZoneId.of("Z");
+                    LocalDateTime setRefreshPoint = LocalDateTime.of(datetime_now.getYear(), datetime_now.getMonth(), datetime_now.getDayOfMonth(), 17, 00);
                     // if now is after the pricecreated time of the [0] price in teh octPrices array plus ten hours, it's time for refreshing, otherwise dont make a wasted call to the Octpus API.  If it's successful octoPrices.priceCreateTime will reset to now and the if condition is false.
                     if (datetime_now.isAfter(octoPrices[0].priceCreateTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().plusHours(10))) {
                         GetAPIData();
                     }
+                    // if it's between 5 and 5:30 PM lets get always
+                    // TODO can we test if we hold a price far enough in the future?  new function?
+                    if (datetime_now.isAfter(setRefreshPoint) && (datetime_now.isBefore(setRefreshPoint.plusMinutes(30)))) {
+                        if (!octoPrices[0].priceCreateTime.withZoneSameInstant(timezone).toLocalDateTime().isAfter(setRefreshPoint))
+                        System.out.println("Triggered on time");
+                        GetAPIData();
+                    }                  
                    
                 } catch (InterruptedException | URISyntaxException | IOException e ) {
                     // TODO Auto-generated catch block
