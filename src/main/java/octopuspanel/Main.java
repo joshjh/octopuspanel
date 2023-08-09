@@ -108,6 +108,7 @@ public class Main {
                     ShowNext30Mins(Display, api, screenMoveDelay);
                     ShowNext60Mins(Display, api, screenMoveDelay);
                     ShowCheapest3Segements(Display, api, screenMoveDelay);
+                    ShowCheapestTonight(Display, api, screenMoveDelay);
                 }
             } catch (MultiInstanceError | InterruptedException e) {
                 // TODO Auto-generated catch block
