@@ -1,5 +1,7 @@
 package octopuspanel;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -11,7 +13,7 @@ public class UnitTests {
     static OctoPrice octoPriceOne = new OctoPrice();
     static OctoPrice octoPriceTwo = new OctoPrice();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws URISyntaxException, IOException {
         buildOctoProducts();
         System.out.println(" Equality tests: "+ equalsTrueTest(octoProductOne, octoProductTwo));
         System.out.println(" Equality tests: "+ equalsTrueTest(octoPriceOne, octoPriceTwo));
@@ -19,7 +21,11 @@ public class UnitTests {
         HashcodeTest(octoProductOne, octoProductTwo);
         buildOctoProducts();
         HashcodeTest(octoPriceOne, octoPriceTwo);
-      
+        AgileAPI api = new AgileAPI(4);
+        Thread t1 = new Thread(api);
+        t1.setDaemon(true);
+        t1.start();
+        System.out.println(api.CheapestTonight());
 
     }
 

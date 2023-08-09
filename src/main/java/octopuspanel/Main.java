@@ -73,6 +73,17 @@ public class Main {
         Thread.sleep(delay);
     }
 
+    public static void ShowCheapestTonight(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "Cheapest Tonight:".toCharArray();
+        char[] secondline = api.CheapestTonight().toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        Thread.sleep(delay);
+    }
+
     /**
      * @param args the command line arguments
      */

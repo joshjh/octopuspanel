@@ -158,8 +158,8 @@ public class AgileAPI extends Thread{
                 }
             }
         }
-        return lowString;
-     }
+    return lowString;
+    }
     
     
     /** 
@@ -185,9 +185,10 @@ public class AgileAPI extends Thread{
                     // if it's between 5 and 5:30 PM lets get always
                     // TODO can we test if we hold a price far enough in the future?  new function?
                     if (datetime_now.isAfter(setRefreshPoint) && (datetime_now.isBefore(setRefreshPoint.plusMinutes(30)))) {
-                        if (!octoPrices[0].priceCreateTime.withZoneSameInstant(timezone).toLocalDateTime().isAfter(setRefreshPoint))
+                        if (!octoPrices[0].priceCreateTime.withZoneSameInstant(timezone).toLocalDateTime().isAfter(setRefreshPoint)) {
                         System.out.println("Triggered on time");
                         GetAPIData();
+                        }
                     }                  
                    
                 } catch (InterruptedException | URISyntaxException | IOException e ) {
@@ -197,10 +198,31 @@ public class AgileAPI extends Thread{
                 }
         }
     }
+    
     public void PrintProducts() {
         for (OctoProduct product : octoProducts) {
             System.out.println(product);
         }
     
     }
+
+    public String CheapestTonight() {
+        ZoneId zuluzone = ZoneId.of("Z"); // prices are stored in ZULU time in the OctoPrice Object.
+        ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
+        double cost = 30000.00D;
+        String lowString = "lowest tonight failed";
+        for (OctoPrice octoPrice : octoPrices) {
+            // look between 22:00 tonight and 05:00 tomorrow AM.
+            if (octoPrice.StartTime.isAfter(datetime_now.withHour(22)) && (octoPrice.StartTime.isBefore(datetime_now.withHour(5).plusDays(1)))) {
+                if (octoPrice.UnitPrice < cost) {
+                    cost = octoPrice.UnitPrice;
+                    lowString = String.valueOf(RoundResult(octoPrice.UnitPrice) + ":" + octoPrice.StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime() +
+                    ":" + octoPrice.EndTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime());
+                }
+            }
+        }
+    return lowString;
+    }
+
+
 }

@@ -8,7 +8,7 @@ public class OctoPrice {
     public double UnitPrice;
 
     public String toString() {
-        return StartTime + "::" + EndTime + ":" + UnitPrice;
+        return StartTime + "::" + EndTime + ":" + UnitPrice + " created: :" + priceCreateTime;
     }
     
     @Override
