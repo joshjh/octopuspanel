@@ -3,8 +3,8 @@ module com.rasp.octopuspanel {
     requires org.slf4j.simple;      //slf4j-simple-2.0.0-alpha1.jar & simplelogger.properties
     requires com.pi4j;
     requires com.pi4j.plugin.raspberrypi;
-    requires com.pi4j.plugin.pigpio;
-    requires com.pi4j.library.pigpio;
+    // requires com.pi4j.plugin.pigpio;
+    // requires com.pi4j.library.pigpio;
     uses com.pi4j.extension.Extension;
     uses com.pi4j.provider.Provider;
     requires org.json;
