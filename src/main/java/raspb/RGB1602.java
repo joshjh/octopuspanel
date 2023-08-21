@@ -65,13 +65,14 @@ public class RGB1602 {
     private boolean backlight;
     private I2C LCDinterface;
     private I2C RGBinterface;
+    private Context pi4j; 
  
     // these are what we think are the bytes for writing controls/commands to the two registers
 
     public RGB1602(int rows, int columns) throws MultiInstanceError {
         // lets not fire up multiple instances of the i2c connectors!
         if (!RGB1602.lcdInstanceExists && !RGB1602.rgbInstanceExists) {
-        Context pi4j = Pi4J.newAutoContext();
+        pi4j = Pi4J.newAutoContext();
         this.rows = rows;
         this.columns = columns;
         //providers
@@ -107,7 +108,7 @@ public class RGB1602 {
         try {
             Thread.sleep(millis, nanos);
         } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+            
         }
     }
 
@@ -196,7 +197,12 @@ public class RGB1602 {
             sleep(500, 0);
     }
     
-    
+    public void lcdShutDown() {
+        closeInterface();
+        pi4j.shutdown();
+
+    }
+
     /** 
      * @param y single char to write to the buffer
      * @param wait int how long to sleep after writing to the register
@@ -262,6 +268,8 @@ public class RGB1602 {
         RGBinterface.writeRegister(REG_GREEN, 0);
     }
     public void closeInterface() {
+        lcdSetRGB(0, 0, 0);
+        lcdClearDisplay();
         LCDinterface.close();
         RGBinterface.close();
     }

@@ -65,6 +65,7 @@ public class Main {
             AgileAPI api = new AgileAPI(4);
             Thread t1 = new Thread(api);
             t1.setDaemon(true);
+            // start the API daemon thread.
             t1.start();
             
             System.out.println(api.GetCurrentPrice());
@@ -79,8 +80,16 @@ public class Main {
                 Ticker.setAPI(api);
                 Ticker.setDisplay(Display);
                 TickerThread = new Thread(Ticker);
-                TickerThread.start();
+                
                 System.out.println(String.format("The thread state is %s", TickerThread.getState()));
+                // add the shutdown hooks.
+                ShutDownHook shutDownHook = new ShutDownHook(api, Display);
+                Thread shutDownHookThread = new Thread(shutDownHook);
+                Runtime.getRuntime().addShutdownHook(shutDownHookThread);;
+
+                // start the Ticker - this is the last (only non-daemon thread)
+                TickerThread.start();
+
                 
             } catch (MultiInstanceError e) {
                 // TODO Auto-generated catch block
