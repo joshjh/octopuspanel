@@ -1,6 +1,6 @@
 package octopuspanel;
 
-import raspb.RGB1602;
+import com.raspb.RGB1602;
 
 public class Ticker extends Thread{
     static int screenMoveDelay = 10000;

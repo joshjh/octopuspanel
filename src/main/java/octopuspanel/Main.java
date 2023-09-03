@@ -6,8 +6,9 @@
 package octopuspanel;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import raspb.RGB1602;
-import raspb.MultiInstanceError;
+import com.raspb.RGB1602;
+import com.raspb.MultiInstanceError;
+
 /**
  *
  * @author josh harney

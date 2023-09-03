@@ -25,6 +25,6 @@ If you want something else implemented, let me know.  Or submit a pull request.
 If you're moving to Octopus Agile and you think this kit is useful, please use my OCTOPUS energy referral:
 <a href="https://share.octopus.energy/aqua-sun-769"> AQUA-SUN-769 </a>
 
-![Picture of the working device](images/IMG_20230809_192633715_HDR.jpg)]
+![Picture of the working device](images/IMG_20230809_192633715_HDR.jpg)
 
 Josh Harney.

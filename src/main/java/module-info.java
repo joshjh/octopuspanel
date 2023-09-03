@@ -5,15 +5,14 @@ module com.rasp.octopuspanel {
     requires com.pi4j.plugin.raspberrypi;
     // requires com.pi4j.plugin.pigpio;
     // requires com.pi4j.library.pigpio;
-    uses com.pi4j.extension.Extension;
-    uses com.pi4j.provider.Provider;
     requires org.json;
     requires org.apache.httpcomponents.httpclient;
     requires org.apache.httpcomponents.httpcore;
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.apache.httpcomponents.client5.httpclient5;
+    requires com.raspb.agilelightcycle;
     // allow access to classes in the following namespaces for Pi4J annotation processing
     opens octopuspanel to com.pi4j;
 
-    //exports octopuspanel;
+    exports octopuspanel;
 }

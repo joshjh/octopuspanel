@@ -13,6 +13,13 @@
         <url></url>
     </organization>
     -->
+    <distributionManagement>
+        <repository>
+            <id>josh-maven-repo-snapshots</id>
+            <name>Joshs Maven Repo</name>
+            <url>http://localhost:2002/snapshots</url>
+        </repository>
+    </distributionManagement>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,18 +38,10 @@
     <dependencies>
 
         <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-library-pigpio</artifactId>
-            <version>2.3.0</version>
+            <groupId>com.raspb</groupId>
+            <artifactId>agilelightcycle</artifactId>
+            <version>1.0-SNAPSHOT</version>
         </dependency>
-
-
-        <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-plugin-linuxfs</artifactId>
-            <version>2.3.0</version>
-        </dependency>
-
 
     <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -78,33 +77,10 @@
         <dependency>
             <groupId>com.pi4j</groupId>
             <artifactId>pi4j-core</artifactId>
-            <version>${pi4j.version}</version>
+            
         </dependency>
 
-        <!-- include Pi4J Plugins (Platforms and I/O Providers) -->
-        <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-plugin-raspberrypi</artifactId>
-            <version>${pi4j.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-core</artifactId>
-            <version>${pi4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-plugin-raspberrypi</artifactId>
-            <version>${pi4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.pi4j</groupId>
-            <artifactId>pi4j-plugin-pigpio</artifactId>
-            <version>${pi4j.version}</version>
-        </dependency>
-
-    </dependencies>
+      </dependencies>
         
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -284,6 +260,16 @@
 
         <dependencies>
 
+              <dependency>
+                  <groupId>com.pi4j</groupId>
+                  <artifactId>pi4j-core</artifactId>
+                  <version>2.3.0</version>
+              </dependency>
+
+
+              
+
+
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
@@ -292,4 +278,5 @@
 
       </dependencies>
       </dependencyManagement>
+
 </project>
