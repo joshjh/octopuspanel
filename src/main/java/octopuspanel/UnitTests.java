@@ -23,10 +23,19 @@ public class UnitTests {
         HashcodeTest(octoPriceOne, octoPriceTwo);
         AgileAPI api = new AgileAPI(4);
         Thread t1 = new Thread(api);
-        t1.setDaemon(true);
-        t1.start();
+        api.setDaemon(true);
         System.out.println(api.CheapestTonight());
+        
+        System.out.println(t1);
+        System.out.println(api);
+        api.start();
+        apiInterruptTest(api);
+    }
 
+    public static void apiInterruptTest(AgileAPI api) {
+        api.interrupt();
+        
+        
     }
 
     public static void HashcodeTest(OctoProduct octo1, OctoProduct octo2) {

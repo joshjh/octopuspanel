@@ -11,8 +11,8 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.apache.hc.core5.http.protocol.BasicHttpContext;
 import org.apache.hc.core5.http.protocol.HttpContext;
+import org.apache.hc.core5.io.CloseMode;
 import org.apache.http.client.utils.URIBuilder;
-import java.util.concurrent.TimeUnit;
 
 public class AgileAPI extends Thread{
     final static String AGILE_PRODUCT_CODE = "AGILE-FLEX-BB-23-02-08";
@@ -23,10 +23,26 @@ public class AgileAPI extends Thread{
     public OctoPrice[] octoPrices;
     public OctoProduct[] octoProducts;
     public int agileRefreshInterval;
+    public boolean apiWarnFlag = false;
+    HttpContext context = new BasicHttpContext();
+    CloseableHttpClient httpclient = InitHttp();
+    URI productsuri, priceuri;
     
     private CloseableHttpClient InitHttp() {
         CloseableHttpClient httpclient = HttpClients.createDefault();
         return httpclient;
+    }
+
+    public AgileAPI restartAPI() throws URISyntaxException, IOException {
+        httpclient.close(CloseMode.GRACEFUL);
+        // need to let the httpclient close down
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return new AgileAPI(4);
     }
 
     public static double RoundResult(double d) {
@@ -66,9 +82,7 @@ public class AgileAPI extends Thread{
     }
     
     public void GetAPIData() throws URISyntaxException, java.io.IOException {
-        HttpContext context = new BasicHttpContext();
-        CloseableHttpClient httpclient = InitHttp();
-        URI productsuri, priceuri;
+
         
         try {
         // Products
@@ -92,6 +106,9 @@ public class AgileAPI extends Thread{
         // agile refresh interval (minutes)
         this.agileRefreshInterval = agileRefreshInterval;
         GetAPIData();
+        this.setDaemon(true);
+        // return the running API thread
+        this.start();
         }
 
     public double GetCurrentPrice() {
@@ -166,15 +183,15 @@ public class AgileAPI extends Thread{
      * run method for the threaded implementation of the API
      * examines the time via LocalDateTime.now().atZone(timezone);
      * we will look for updates after 4 pm.
-     * @throws RuntimeException
+     * @throws APIConnectionException
      */
-    public void run() throws RuntimeException {
+    public void run() {
         System.out.println("Agile API Thread Running");
         
         while (true) {
      
                 try {
-                    TimeUnit.MINUTES.sleep(agileRefreshInterval);
+                    Thread.sleep(agileRefreshInterval*60000);
                     LocalDateTime datetime_now = LocalDateTime.now();
                     ZoneId zuluzone = ZoneId.of("Z");
                     LocalDateTime setRefreshPoint = LocalDateTime.of(datetime_now.getYear(), datetime_now.getMonth(), datetime_now.getDayOfMonth(), 17, 00);
@@ -189,12 +206,19 @@ public class AgileAPI extends Thread{
                         System.out.println("Triggered on time");
                         GetAPIData();
                         }
-                    }                  
-                   
-                } catch (InterruptedException | URISyntaxException | IOException e ) {
+                    }            
+                } 
+                catch (IOException e) {
+                    Thread.currentThread().interrupt(); // set the interupted thread that the ticker will test.
+                    this.apiWarnFlag = true;
+                }
+                catch (InterruptedException | URISyntaxException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
-                    throw new RuntimeException(e);
+                    System.out.println("Interrupted!!!!!!");
+                    this.apiWarnFlag = true;
+                    System.out.println(String.format("Setting the  API warn flag: %b", apiWarnFlag));
+                    
                 }
         }
     }

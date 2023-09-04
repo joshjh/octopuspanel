@@ -64,34 +64,28 @@ public class Main {
     public static void main(String[] args) {
         try {
             AgileAPI api = new AgileAPI(4);
-            Thread t1 = new Thread(api);
-            t1.setDaemon(true);
-            // start the API daemon thread.
-            t1.start();
-            
+            apiThread =  api;
             System.out.println(api.GetCurrentPrice());
-            System.out.println(String.format("The thread state is %s", t1.getState()));
+            System.out.println(String.format("The thread state is %s", apiThread.getState()));
             try {
                 RGB1602 Display = new RGB1602(2, 16);
                 Display.displayInit();
                 Display.clearDisplay();
                 System.out.println("Building button listeners");
                 buildButtons(Display, api);
-                Ticker Ticker = new Ticker();
+                Ticker Ticker = new Ticker();             
                 Ticker.setAPI(api);
                 Ticker.setDisplay(Display);
-                TickerThread = new Thread(Ticker);
                 
-                System.out.println(String.format("The thread state is %s", TickerThread.getState()));
                 // add the shutdown hooks.
                 ShutDownHook shutDownHook = new ShutDownHook(api, Display);
                 Thread shutDownHookThread = new Thread(shutDownHook);
                 Runtime.getRuntime().addShutdownHook(shutDownHookThread);;
 
                 // start the Ticker - this is the last (only non-daemon thread)
-                TickerThread.start();
-
-                
+                TickerThread = Ticker;
+                Ticker.start();
+                   
             } catch (MultiInstanceError e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();

@@ -1,5 +1,8 @@
 package octopuspanel;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import com.raspb.RGB1602;
 
 public class Ticker extends Thread{
@@ -85,10 +88,38 @@ public class Ticker extends Thread{
 
     @Override
     public void run() {
-        //  call current price on first run so we set the colour initially
-        // do we need to catch nulltype, as we need to call the setters before run.
+        mainLoop();
+    }
+
+    private void megaDeathErrorHandler() {
+        try {
+            Display.lcdMegaDeathError();
+        } catch (InterruptedException e) {
+            try {
+                api = api.restartAPI();
+                Display.lcdAutoScroll(false);
+                Display.clearDisplay();
+                Display.lcdCursorHome();
+                return;
+            } catch (URISyntaxException | IOException e1) {
+                // just catch it for now.  IOException is a failure to resolve/get (networking generally.  URI is fixed so shouldn't occur.)
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    private void mainLoop() {
         while (true) {
+
+            if (!api.apiWarnFlag) {
             nextScreen(Display, api);
+            }
+
+            else {
+                System.out.print("API INTERRUPT");
+                megaDeathErrorHandler();
+            }
+            mainLoop();
         }
     }
 
@@ -122,6 +153,7 @@ public class Ticker extends Thread{
             }
             currentScreen++;
         }
+        // this InterruptedException is triggered by the Ticker Thread being interupted in sleep, normally by the button handlers.
         catch (InterruptedException e) {
             System.out.println("INTERRUPTED");
             currentScreen++;
