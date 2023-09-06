@@ -82,10 +82,9 @@ public class AgileAPI extends Thread{
     }
     
     public void GetAPIData() throws URISyntaxException, java.io.IOException {
-
-        
-        try {
-        // Products
+        // CloseableHttpClient is an AutoClosable so we can try with resources to tidy this call up.
+        try (CloseableHttpClient httpclient = InitHttp()) {
+            // Products
             productsuri = AgileProductsURI();
             HttpGet products_httpget = new HttpGet(productsuri);
             octoProducts = ResponseHandlers.ProductResponseHandle(httpclient, products_httpget, context);
@@ -94,13 +93,13 @@ public class AgileAPI extends Thread{
             priceuri = AgilePriceURI();
             HttpGet prices_httpget = new HttpGet(priceuri);
             octoPrices = ResponseHandlers.AgilePriceResponseHandle(httpclient, prices_httpget, context);
+        } catch (Exception e) {
             
         }
-        finally {
-            httpclient.close();
+        
             lastAPIUpdate =  LocalDateTime.now().atZone(timezone);
-        }
     }
+    
 
     public AgileAPI(int agileRefreshInterval) throws URISyntaxException, java.io.IOException {
         // agile refresh interval (minutes)
@@ -109,7 +108,8 @@ public class AgileAPI extends Thread{
         this.setDaemon(true);
         // return the running API thread
         this.start();
-        }
+    
+    }
 
     public double GetCurrentPrice() {
         ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
@@ -120,7 +120,7 @@ public class AgileAPI extends Thread{
             
             }
             return 0.00D;
-        }
+    }
 
     public double NextPrice() {
         ZonedDateTime next_segment = LocalDateTime.now().atZone(timezone).plusMinutes(30);
@@ -130,7 +130,7 @@ public class AgileAPI extends Thread{
                 }
             }
         return 0.00D;
-        }
+    }
         
     public double NextHour() {
         ZonedDateTime next_segment = LocalDateTime.now().atZone(timezone).plusHours(1);
@@ -139,8 +139,8 @@ public class AgileAPI extends Thread{
                     return RoundResult(octoprice.UnitPrice);
                 }
             }
-        return 0.00D;
-        }
+            return 0.00D;
+    }
     
      public String CheapestSegment() {
         ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
