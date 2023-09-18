@@ -178,6 +178,34 @@ public class AgileAPI extends Thread{
     return lowString;
     }
     
+    public boolean isPlugePrice() {
+        // loop up until the last three remain.  octoPrices[] is built in reverse order, so next time segment comes before the current one in the array.  ie [0] is the latest, [-1] the second latest and length-1 the earliest in the array.
+        for (int x = 0; x < octoPrices.length; x++) {
+            if (octoPrices[x].UnitPrice < 0.00D) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public String PlungeSegment() {
+    ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
+    double lowestDouble = 0.00D;
+    String lowString = "Plunge Price fail";
+    ZoneId zuluzone = ZoneId.of("Z"); // prices are stored in ZULU time in the OctoPrice Object.
+    for (OctoPrice octoPrice : this.octoPrices) {
+            if (octoPrice.EndTime.isAfter(datetime_now)) {
+                if (octoPrice.UnitPrice <= lowestDouble) {
+                    lowestDouble = octoPrice.UnitPrice;
+                    // move to local datetime, at zuro, then create with current timezone, then local date time, then local time.  etc etc.
+                    lowString = String.valueOf(RoundResult(octoPrice.UnitPrice)) + " @"+ octoPrice.StartTime.toLocalDateTime().atZone(zuluzone).withZoneSameInstant(timezone).toLocalDateTime().toLocalTime();
+                }
+            }
+        }
+    return lowString;
+    }   
+
+     
     
     /** 
      * run method for the threaded implementation of the API

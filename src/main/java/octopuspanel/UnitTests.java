@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 
 public class UnitTests {
     
@@ -23,13 +24,13 @@ public class UnitTests {
         HashcodeTest(octoPriceOne, octoPriceTwo);
         AgileAPI api = new AgileAPI(4);
         Thread t1 = new Thread(api);
-        api.setDaemon(true);
         System.out.println(api.CheapestTonight());
         
         System.out.println(t1);
         System.out.println(api);
-        api.start();
-        apiInterruptTest(api);
+        System.out.println(String.format("is plunge price: %b", api.isPlugePrice()));
+        System.out.println(api.PlungeSegment());
+        testPlungeColours();
     }
 
     public static void apiInterruptTest(AgileAPI api) {
@@ -109,6 +110,12 @@ public class UnitTests {
         octoPriceOne.EndTime = ZonedDateTime.of(2023, 01, 21, 2, 10, 02, 22, ZoneId.of("Z"));
         octoPriceTwo.EndTime = ZonedDateTime.of(2023, 01, 21, 2, 10, 02, 22, ZoneId.of("Z"));
     }
-    
+
+    public static void testPlungeColours() {
+        int [][] colours = ColourSetter.PlungeColours();
+        for (int x = 0; x < 3; x++) {
+            System.out.println(Arrays.toString(colours[x]));
+        }
+    }
 
 }

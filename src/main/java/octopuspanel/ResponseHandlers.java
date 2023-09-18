@@ -13,7 +13,7 @@ import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-public class ResponseHandlers {
+public abstract class ResponseHandlers {
     public static OctoProduct[] ProductResponseHandle(CloseableHttpClient httpclient, HttpGet httpget, HttpContext context) throws IOException {
         
         HttpClientResponseHandler<OctoProduct[]> OctoProductsHandler = new HttpClientResponseHandler<OctoProduct[]>() {

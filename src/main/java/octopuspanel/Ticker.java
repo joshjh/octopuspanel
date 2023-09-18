@@ -78,6 +78,22 @@ public class Ticker extends Thread{
         Thread.sleep(delay);
     }
 
+    public void ShowPlunge(RGB1602 Display, AgileAPI api, int delay) throws InterruptedException {
+        Display.lcdClearDisplay();
+        Display.lcdSetCursor(0, 0);
+        char[] firstline = "PLUNGE PRICE!".toCharArray();
+        char [] secondline = String.valueOf(api.PlungeSegment()).toCharArray();
+        Display.lcdWrite(firstline);
+        Display.lcdSetCursor(0, 1);
+        Display.lcdWrite(secondline);
+        int [][] colours = ColourSetter.PlungeColours();
+        for (int x = 0; x < 3; x++) {
+            Display.lcdSetRGB(colours[x]);
+            Thread.sleep(delay/3);
+        }
+        Display.lcdSetRGB(ColourSetter.GetColour(api.GetCurrentPrice()));
+    }
+
     public void setDisplay(RGB1602 Display) {
         this.Display = Display;
     }
@@ -146,7 +162,12 @@ public class Ticker extends Thread{
                     break;
                 case 4:
                     ShowCheapest3Segements(Display, api, screenMoveDelay);
+                    if (api.isPlugePrice()) {
+                        ShowPlunge(Display, api, screenMoveDelay);
+                        break;
+                    }
                     break;
+                    
                 case 5:
                     showCheapestTonight(Display, api, screenMoveDelay);
                     break;

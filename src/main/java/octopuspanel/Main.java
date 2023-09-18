@@ -21,7 +21,7 @@ public class Main {
         TickerThread.interrupt();
     }
 
-    public static void buildButtons(RGB1602 Display, AgileAPI api) {
+    protected static void buildButtons(RGB1602 Display, AgileAPI api) {
         // button handlers
         // we cannot just run these on event as you'll get two calls, the state going HIGH (button press) and LOW (button release)
         Display.select_button.addListener(event -> {

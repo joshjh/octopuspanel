@@ -1,6 +1,6 @@
 package octopuspanel;
 
-public class ColourSetter {
+public abstract class ColourSetter {
       
     
     /** 
@@ -43,5 +43,27 @@ public class ColourSetter {
         return colour;
        
         
+    }
+
+    
+    /** Return a int[][] with orange, blue and green in sets of three.  ie: [[255,170,0], [60, 60, 250], etc]
+     * @return int[][]
+     */
+    public static int[][] PlungeColours() {
+            int[] colour = new int[9];
+            //orange
+            colour[0] = 255;
+            colour[1] = 170;
+            colour[2] = 0;
+           // blue
+            colour[3] = 60;
+            colour[4] = 60;
+            colour[5] = 250;
+            // green
+            colour[6] = 1;
+            colour[7] = 250;
+            colour[8] = 1;
+            int[][] colour_array_array = {{colour[0], colour[1], colour[2]}, {colour[3], colour[4], colour[5]}, {colour[6], colour[7], colour[8]}};
+            return colour_array_array;
     }
 }
