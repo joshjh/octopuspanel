@@ -178,10 +178,16 @@ public class AgileAPI extends Thread{
     return lowString;
     }
     
+    
+    /**  Check if there is plunge pricing in the known future.  We regard plunge as < 2.00D, rather than the strict negative
+     * as we still like charging cards and stuff.  Returns a boolean if there is a matching OctoPrice object in the loaded API array.
+     * @return boolean
+     */
     public boolean isPlugePrice() {
-        // loop up until the last three remain.  octoPrices[] is built in reverse order, so next time segment comes before the current one in the array.  ie [0] is the latest, [-1] the second latest and length-1 the earliest in the array.
+        
+        ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
         for (int x = 0; x < octoPrices.length; x++) {
-            if (octoPrices[x].UnitPrice < 0.00D) {
+            if (octoPrices[x].UnitPrice < 2.00D & octoPrices[x].EndTime.isAfter(datetime_now)) {
                 return true;
             }
         }
@@ -190,7 +196,7 @@ public class AgileAPI extends Thread{
 
     public String PlungeSegment() {
     ZonedDateTime datetime_now = LocalDateTime.now().atZone(timezone);
-    double lowestDouble = 0.00D;
+    double lowestDouble = 2.00D;
     String lowString = "Plunge Price fail";
     ZoneId zuluzone = ZoneId.of("Z"); // prices are stored in ZULU time in the OctoPrice Object.
     for (OctoPrice octoPrice : this.octoPrices) {
